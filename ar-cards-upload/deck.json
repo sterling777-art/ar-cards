@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "title": "My AR Deck",
+  "cards": [
+    {
+      "id": "card-01",
+      "name": "box",
+      "image": "cards/card-01.png",
+      "print": "print/card-01.png",
+      "model": "models/card-01.glb",
+      "modelName": "box.glb",
+      "aspect": 1.3333333333333333,
+      "placement": "flat",
+      "scale": 0.75,
+      "turn": 0,
+      "spin": true
+    }
+  ]
+}
