@@ -4,14 +4,14 @@
   "cards": [
     {
       "id": "card-01",
-      "name": "box",
+      "name": "test-page-2",
       "image": "cards/card-01.png",
       "print": "print/card-01.png",
       "model": "models/card-01.glb",
-      "modelName": "box.glb",
-      "aspect": 1.3333333333333333,
-      "placement": "flat",
-      "scale": 0.75,
+      "modelName": "test-page-2.glb",
+      "aspect": 1.2941176470588236,
+      "placement": "upright",
+      "scale": 1,
       "turn": 0,
       "spin": true
     }

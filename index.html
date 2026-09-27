@@ -1,1 +1,115 @@
-<meta http-equiv="refresh" content="0; url=my-ar-deck-site-2/">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>My AR Deck</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-family: system-ui, sans-serif; color: #f2f2ee; }
+  #ar { position: fixed; inset: 0; }
+  #start { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 24px; background: #111; }
+  #start h1 { margin: 0; font-size: 26px; }
+  #start p { margin: 0; max-width: 320px; line-height: 1.4; opacity: .85; }
+  #start .small { font-size: 13px; opacity: .6; }
+  #go { font-size: 19px; padding: 14px 34px; border: 0; border-radius: 999px; background: #D8A843; color: #1a1405; font-weight: 700; }
+  #hint { position: fixed; left: 0; right: 0; bottom: 28px; z-index: 5; text-align: center; font-size: 15px; text-shadow: 0 1px 3px #000; pointer-events: none; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+} }
+</script>
+</head>
+<body>
+<div id="ar"></div>
+<div id="start">
+  <h1>My AR Deck</h1>
+  <p>Tap start, allow the camera, then hold a card in view.</p>
+  <button id="go">Start</button>
+  <p class="small">Open this page in Safari or Chrome. Apps like Instagram often block the camera.</p>
+</div>
+<div id="hint" hidden>Point the camera at a card</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { MindARThree } from 'mindar-image-three';
+
+const placeModel = function placeModel(THREE, model, aspect, cfg) {
+  if (model.parent) model.parent.remove(model);
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const inner = new THREE.Group(), pivot = new THREE.Group(), holder = new THREE.Group();
+  inner.position.set(-center.x, -box.min.y, -center.z);
+  inner.add(model); pivot.add(inner); holder.add(pivot);
+  const sx = Math.max(size.x, 1e-6), sy = Math.max(size.y, 1e-6), sz = Math.max(size.z, 1e-6);
+  const across = cfg.spin ? Math.hypot(sx, sz) : sx;   // widest it gets while turning
+  const deep = cfg.spin ? Math.hypot(sx, sz) : sz;
+  const flat = cfg.placement === 'flat';
+  let k = flat ? 0.8 * Math.min(1 / across, aspect / deep) : 0.8 * Math.min(1 / across, aspect / sy);
+  k *= cfg.scale || 1;
+  pivot.scale.setScalar(k);
+  pivot.rotation.y = (cfg.turn || 0) * Math.PI / 180;
+  if (flat) holder.rotation.x = Math.PI / 2;           // model up = out of the card
+  else holder.position.set(0, -sy * k / 2, deep * k / 2 + 0.02); // centered, just in front of the paper
+  return { holder, pivot };
+};
+
+const deck = await (await fetch('./deck.json')).json();
+const mindar = new MindARThree({
+  container: document.querySelector('#ar'),
+  imageTargetSrc: './targets.mind',
+  maxTrack: 1,
+  filterMinCF: 0.0001,
+  filterBeta: 0.001,
+  uiScanning: 'no'
+});
+const { renderer, scene, camera } = mindar;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.1));
+
+const draco = new DRACOLoader();
+draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/gltf/');
+const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
+const hint = document.querySelector('#hint');
+const placed = [];
+let visible = 0;
+
+deck.cards.forEach((card, i) => {
+  const anchor = mindar.addAnchor(i);
+  loader.load(card.model, gltf => {
+    const p = placeModel(THREE, gltf.scene, card.aspect, card);
+    anchor.group.add(p.holder);
+    placed.push({ p, card });
+  });
+  anchor.onTargetFound = () => { visible++; hint.hidden = true; };
+  anchor.onTargetLost = () => { visible = Math.max(0, visible - 1); hint.hidden = visible > 0; };
+});
+
+document.querySelector('#go').addEventListener('click', async () => {
+  const start = document.querySelector('#start');
+  try {
+    await mindar.start();
+  } catch (e) {
+    start.querySelector('p').textContent = 'The camera did not start. Allow camera access for this site, then reload.';
+    return;
+  }
+  start.remove();
+  hint.hidden = false;
+  const clock = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const dt = clock.getDelta();
+    for (const { p, card } of placed) if (card.spin) p.pivot.rotation.y += dt * 0.6;
+    renderer.render(scene, camera);
+  });
+});
+</script>
+</body>
+</html>
