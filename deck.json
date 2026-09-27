@@ -11,8 +11,8 @@
       "modelName": "test-page-2.glb",
       "aspect": 1.2941176470588236,
       "placement": "upright",
-      "scale": 1,
-      "turn": 0,
+      "scale": 0.35,
+      "turn": 175,
       "spin": true
     }
   ]
