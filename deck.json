@@ -4,15 +4,15 @@
   "cards": [
     {
       "id": "card-01",
-      "name": "test-page-2",
+      "name": "gilded-cage",
       "image": "cards/card-01.png",
       "print": "print/card-01.png",
       "model": "models/card-01.glb",
-      "modelName": "test-page-2.glb",
-      "aspect": 1.2941176470588236,
+      "modelName": "gilded-cage.glb",
+      "aspect": 1.3601208459214502,
       "placement": "upright",
-      "scale": 0.35,
-      "turn": 175,
+      "scale": 1,
+      "turn": 0,
       "spin": true
     }
   ]
