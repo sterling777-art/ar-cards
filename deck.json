@@ -4,16 +4,16 @@
   "cards": [
     {
       "id": "card-01",
-      "name": "gilded-cage",
+      "name": "Gilded cage ar",
       "image": "cards/card-01.png",
       "print": "print/card-01.png",
       "model": "models/card-01.glb",
       "modelName": "gilded-cage.glb",
       "aspect": 1.3601208459214502,
       "placement": "upright",
-      "scale": 2,
+      "scale": 1,
       "turn": 0,
-      "spin": true
+      "spin": false
     }
   ]
 }

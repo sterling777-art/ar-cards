@@ -80,6 +80,7 @@ draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/li
 const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
 const hint = document.querySelector('#hint');
 const placed = [];
+const mixers = [];
 let visible = 0;
 
 deck.cards.forEach((card, i) => {
@@ -88,6 +89,11 @@ deck.cards.forEach((card, i) => {
     const p = placeModel(THREE, gltf.scene, card.aspect, card);
     anchor.group.add(p.holder);
     placed.push({ p, card });
+    if (gltf.animations.length) {
+      const mixer = new THREE.AnimationMixer(gltf.scene);
+      gltf.animations.forEach(clip => mixer.clipAction(clip).play());
+      mixers.push(mixer);
+    }
   });
   anchor.onTargetFound = () => { visible++; hint.hidden = true; };
   anchor.onTargetLost = () => { visible = Math.max(0, visible - 1); hint.hidden = visible > 0; };
@@ -107,6 +113,7 @@ document.querySelector('#go').addEventListener('click', async () => {
   renderer.setAnimationLoop(() => {
     const dt = clock.getDelta();
     for (const { p, card } of placed) if (card.spin) p.pivot.rotation.y += dt * 0.6;
+    for (const m of mixers) m.update(dt);
     renderer.render(scene, camera);
   });
 });
