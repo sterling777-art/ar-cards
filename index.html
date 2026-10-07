@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>My AR Deck</title>
+<title>Ryan&#39;s Sketchbook</title>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-family: system-ui, sans-serif; color: #f2f2ee; }
   #ar { position: fixed; inset: 0; }
@@ -25,7 +25,7 @@
 <body>
 <div id="ar"></div>
 <div id="start">
-  <h1>My AR Deck</h1>
+  <h1>Ryan&#39;s Sketchbook</h1>
   <p>Tap start, allow the camera, then hold a card in view.</p>
   <button id="go">Start</button>
   <p class="small">Open this page in Safari or Chrome. Apps like Instagram often block the camera.</p>
@@ -64,7 +64,7 @@ const deck = await (await fetch('./deck.json')).json();
 const mindar = new MindARThree({
   container: document.querySelector('#ar'),
   imageTargetSrc: './targets.mind',
-  maxTrack: 1,
+  maxTrack: Math.min(deck.cards.length, 3),   // several cards on a wall can show at once
   filterMinCF: 0.0001,
   filterBeta: 0.001,
   uiScanning: 'no'

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "title": "My AR Deck",
+  "title": "Ryan's Sketchbook",
   "cards": [
     {
       "id": "card-01",
@@ -12,6 +12,19 @@
       "aspect": 1.3289269051321928,
       "placement": "upright",
       "scale": 1.3,
+      "turn": 0,
+      "spin": false
+    },
+    {
+      "id": "card-02",
+      "name": "gilded-cage",
+      "image": "cards/card-02.png",
+      "print": "print/card-02.png",
+      "model": "models/card-02.glb",
+      "modelName": "gilded-cage.glb",
+      "aspect": 1.3601208459214502,
+      "placement": "upright",
+      "scale": 1,
       "turn": 0,
       "spin": false
     }
